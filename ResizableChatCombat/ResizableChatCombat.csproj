@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>ResizableChatCombat</AssemblyName>
+    <Description>Makes chat and combat windows resizable and movable in UI edit mode</Description>
+    <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+
+    <GamePath>/home/jason/.steam/steam/steamapps/common/Erenshor</GamePath>
+    <ManagedPath>$(GamePath)/Erenshor_Data/Managed</ManagedPath>
+    <GalePath>/home/jason/.local/share/com.kesomannen.gale/erenshor/profiles/Default/BepInEx</GalePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(ManagedPath)/Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedPath)/UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedPath)/UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(ManagedPath)/UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(ManagedPath)/UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <Reference Include="BepInEx">
+      <HintPath>$(GalePath)/core/BepInEx.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(GalePath)/core/0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Message Text="Copying DLL to Gale Profile..." Importance="high" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
+          DestinationFolder="$(GalePath)/plugins/ResizableChatCombat/" />
+  </Target>
+
+</Project>
+

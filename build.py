@@ -22,7 +22,7 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WORKSPACE_ROOT = Path(__file__).parent.resolve()
-EXCLUDE_DIRS = {"Template", ".git", "bin", "obj", "__pycache__", ".vs", "node_modules"}
+EXCLUDE_DIRS = {"Templates", ".git", "bin", "obj", "__pycache__", ".vs", "node_modules"}
 
 
 def find_mods():

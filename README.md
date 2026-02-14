@@ -231,9 +231,10 @@ ErenshorMods/
 ├── FastTravelMod/          # Example mod
 ├── AreaMapMod/             # Example mod
 ├── MovementSpeedManager/   # Example mod
-├── Template/               # Basic template
-├── TemplateMonoBehaviour/  # MonoBehaviour template
-├── TemplateConfig/         # Config template
+├── Templates/              # Mod templates
+│   ├── basic/              # Simple Harmony patches
+│   ├── config/             # BepInEx configuration
+│   └── monobehaviour/      # Unity MonoBehaviour/UI
 ├── mods.json               # Mod registry
 ├── build.py                # Build system
 ├── watch.py                # File watcher

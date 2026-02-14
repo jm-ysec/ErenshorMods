@@ -253,7 +253,7 @@ python mod_registry.py list --json
 - **Mod registry:** `mods.json` (source of truth for metadata)
 - **Build output:** `ModName/bin/Debug/net472/ModName.dll`
 - **Packages:** `releases/ModName-X.Y.Z.zip`
-- **Templates:** `Template/`, `TemplateMonoBehaviour/`, `TemplateConfig/`
+- **Templates:** `Templates/basic/`, `Templates/config/`, `Templates/monobehaviour/`
 
 ## Integration Examples
 
