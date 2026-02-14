@@ -54,9 +54,9 @@ def create_mod(name, template="basic", author="YourName", description="A mod for
 
     # Map template names
     template_map = {
-        "basic": "Template",
-        "monobehaviour": "TemplateMonoBehaviour",
-        "config": "TemplateConfig"
+        "basic": "Templates/basic",
+        "monobehaviour": "Templates/monobehaviour",
+        "config": "Templates/config"
     }
 
     template_dir = template_map.get(template.lower(), "Template")

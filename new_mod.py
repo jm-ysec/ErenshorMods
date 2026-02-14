@@ -16,17 +16,17 @@ WORKSPACE_ROOT = Path(__file__).parent.resolve()
 TEMPLATES = {
     "1": {
         "name": "Basic (Harmony Patches)",
-        "path": WORKSPACE_ROOT / "Template",
+        "path": WORKSPACE_ROOT / "Templates" / "basic",
         "description": "Simple mod with Harmony patches only"
     },
     "2": {
         "name": "MonoBehaviour",
-        "path": WORKSPACE_ROOT / "TemplateMonoBehaviour",
+        "path": WORKSPACE_ROOT / "Templates" / "monobehaviour",
         "description": "Mod with Unity MonoBehaviour component for persistent logic and UI"
     },
     "3": {
         "name": "Config",
-        "path": WORKSPACE_ROOT / "TemplateConfig",
+        "path": WORKSPACE_ROOT / "Templates" / "config",
         "description": "Mod with BepInEx configuration system"
     }
 }
@@ -64,10 +64,10 @@ def main():
     
     # Check if template has setup script
     setup_script = template['path'] / "setup_mod.py"
-    
+
     if not setup_script.exists():
-        # Copy setup script from base template
-        base_setup = WORKSPACE_ROOT / "Template" / "setup_mod.py"
+        # Copy setup script from basic template
+        base_setup = WORKSPACE_ROOT / "Templates" / "basic" / "setup_mod.py"
         if base_setup.exists():
             import shutil
             shutil.copy2(base_setup, setup_script)

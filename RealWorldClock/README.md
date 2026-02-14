@@ -1,126 +1,50 @@
-# Erenshor BepInEx Mod Template
+# Real World Clock
 
-## Project Structure
+A BepInEx mod for Erenshor that displays a real-world clock on your screen.
 
-```
-MyModName/
-├── MyModName.csproj    # Build configuration and references
-├── MyModName.sln       # Solution file (optional, for IDE support)
-├── Plugin.cs           # BepInEx entry point — thin loader only
-└── MyModLogic.cs       # All mod functionality (Harmony patches, game logic)
-```
+## Features
 
-### Design Pattern
+- **Real-Time Display**: Shows your system's current time on screen
+- **Configurable Format**: Use any .NET time format string (default: `HH:mm:ss`)
+- **Adjustable Font Size**: Configure text size to your preference
+- **Draggable Position**: Integrates with the game's "Toggle UI Movement" system
+- **Position Persistence**: Clock position saved to config and restored on restart
+- **Auto-Hide**: Clock only shows when logged into a character
 
-**Plugin.cs** is the BepInEx entry point. It should only:
-- Initialize Harmony and call `PatchAll()`
-- Log startup messages
+## Configuration
 
-**ModName.cs** is a static class containing all Harmony patch classes. This keeps
-mod logic cleanly separated from the loading framework.
+Edit the config file at `BepInEx/config/com.noone.realworldclock.cfg`:
 
-## Setup
+| Setting | Default | Description |
+|---------|---------|-------------|
+| ShowClock | true | Enable/disable the clock display |
+| TimeFormat | HH:mm:ss | .NET DateTime format string |
+| FontSize | 18 | Font size for the clock text |
+| PosX | 10 | Horizontal position (pixels from left) |
+| PosY | 10 | Vertical position (pixels from top) |
 
-### 1. Create the project
+### Time Format Examples
 
-Copy the template files and replace all placeholders:
+| Format | Example Output |
+|--------|----------------|
+| `HH:mm:ss` | 14:30:45 |
+| `hh:mm tt` | 02:30 PM |
+| `HH:mm` | 14:30 |
+| `h:mm:ss tt` | 2:30:45 PM |
 
-| Placeholder | Example |
-|---|---|
-| `RealWorldClock` | `ErenshorMyMod` |
-| `RealWorldClock` | `MyModName` |
-| `Displays a real-world clock on screen. Draggable with middle mouse button.` | `My cool Erenshor mod` |
-| `RealWorldClock` | `MyModLogic` |
-| `realworldclock` | `my_mod` |
-| `Real World Clock` | `My Cool Mod` |
+## Usage
 
-Rename `ModName.csproj` and `ModName.cs` to match your mod.
+1. The clock appears automatically when you log into a character
+2. To reposition: Open the game menu → "Toggle UI Movement"
+3. Drag the blue handle below the clock to move it
+4. Click "Toggle UI Movement" again to lock the position
 
-### 2. Create a solution file (optional)
+## Based On
 
-```bash
-dotnet new sln -n MyModName
-dotnet sln add MyModName.csproj
-```
+This mod is a fixed version of [RealWorldClock by Recks](https://thunderstore.io/c/erenshor/p/Recks/RealWorldClock/).
 
-### 3. Verify paths
-
-The `.csproj` assumes:
-- **Game install:** `~/.steam/steam/steamapps/common/Erenshor`
-- **Gale profile:** `~/.local/share/com.kesomannen.gale/erenshor/profiles/Default/BepInEx`
-
-Update `GamePath` and `GalePath` in the `.csproj` if your paths differ.
-
-### 4. Add Unity module references
-
-The template includes `UnityEngine` and `UnityEngine.CoreModule`. If your mod
-needs additional modules (UI, IMGUI, etc.), add them to the `<ItemGroup>`:
-
-```xml
-<Reference Include="UnityEngine.UI">
-  <HintPath>$(ManagedPath)/UnityEngine.UI.dll</HintPath>
-  <Private>False</Private>
-</Reference>
-```
-
-## Building
-
-```bash
-dotnet build
-```
-
-The PostBuild target automatically copies the DLL to your Gale profile's plugins
-folder. Verify the `DestinationFolder` in the `.csproj` matches where BepInEx
-expects to find your plugin.
-
-## Harmony Patch Reference
-
-### Patching a single method (no overloads)
-
-```csharp
-[HarmonyPatch(typeof(TargetClass), "MethodName")]
-public class TargetClass_MethodName_Patch
-{
-    private static void Postfix() { }
-}
-```
-
-### Patching a method with a specific signature
-
-```csharp
-[HarmonyPatch(typeof(TargetClass), "MethodName", new[] { typeof(string), typeof(int) })]
-public class TargetClass_MethodName_Patch
-{
-    private static void Prefix(string param1, int param2) { }
-}
-```
-
-### Patching all overloads of a method
-
-Use `TargetMethods()` when a method has multiple overloads to avoid
-`AmbiguousMatchException`:
-
-```csharp
-[HarmonyPatch]
-public class TargetClass_MethodName_Patch
-{
-    static IEnumerable<MethodBase> TargetMethods()
-    {
-        return AccessTools.GetDeclaredMethods(typeof(TargetClass))
-            .Where(m => m.Name == "MethodName");
-    }
-
-    private static void Prefix(/* first shared param */) { }
-}
-```
-
-## Testing
-
-BepInEx/Harmony mods require a full game restart to pick up a new DLL.
-There is no hot-reload. After building, restart Erenshor completely.
-
-Check the BepInEx log at:
-```
-<GalePath>/LogOutput.log
-```
-
+Fixes and enhancements include:
+- DontDestroyOnLoad pattern to prevent errors on scene changes
+- Integration with game's native UI movement system
+- Click-through prevention while dragging
+- Auto-hide when not logged into a character

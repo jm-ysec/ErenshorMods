@@ -37,9 +37,9 @@ This is a **BepInEx mod development workspace** for Erenshor (Unity game). The w
 
 | Directory | Purpose |
 |-----------|---------|
-| `Template/` | Basic mod template (Harmony patches only) |
-| `TemplateMonoBehaviour/` | Template with Unity component |
-| `TemplateConfig/` | Template with BepInEx configuration |
+| `Templates/basic/` | Basic mod template (Harmony patches only) |
+| `Templates/monobehaviour/` | Template with Unity component |
+| `Templates/config/` | Template with BepInEx configuration |
 | `releases/` | Output directory for packaged mods |
 | `[ModName]/` | Individual mod directories |
 

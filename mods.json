@@ -47,5 +47,13 @@
     "active": true,
     "dependencies": [],
     "tags": []
+  },
+  "ResizableChatCombat": {
+    "version": null,
+    "author": "noone",
+    "description": "Makes chat and combat windows resizable and movable in UI edit mode",
+    "active": true,
+    "dependencies": [],
+    "tags": []
   }
 }

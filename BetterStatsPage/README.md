@@ -1,126 +1,47 @@
-# Erenshor BepInEx Mod Template
+# Better Stats Page
 
-## Project Structure
+A BepInEx mod for Erenshor that provides an enhanced stats and reputation UI with a tabbed interface.
 
-```
-MyModName/
-├── MyModName.csproj    # Build configuration and references
-├── MyModName.sln       # Solution file (optional, for IDE support)
-├── Plugin.cs           # BepInEx entry point — thin loader only
-└── MyModLogic.cs       # All mod functionality (Harmony patches, game logic)
-```
+## Features
 
-### Design Pattern
+- **Tabbed Interface**: Switch between Stats and Reputation views
+- **Comprehensive Stats Display**:
+  - Level and Ascension Level
+  - Experience progress
+  - All attributes (Str, Dex, End, Agi, Int, Wis, Cha) with item bonuses
+  - Crit Chance, Dodge Chance
+  - Physical Attack, Spell Damage Bonus, Healing Bonus
+  - Life Steal, Damage Shield
+  - Attack Speed, Move Speed, Resonance Proc Chance
+- **Reputation Tab**: View all faction standings
+- **Draggable Window**: Reposition the panel using the drag handle
+- **Auto-Update**: Stats refresh automatically when they change
+- **Fade Animations**: Smooth open/close transitions
 
-**Plugin.cs** is the BepInEx entry point. It should only:
-- Initialize Harmony and call `PatchAll()`
-- Log startup messages
+## Configuration
 
-**ModName.cs** is a static class containing all Harmony patch classes. This keeps
-mod logic cleanly separated from the loading framework.
+Edit the config file at `BepInEx/config/com.noone.betterstatspage.cfg`:
 
-## Setup
+| Setting | Default | Description |
+|---------|---------|-------------|
+| ToggleKey | P | Key to open/close the stats window |
+| ActiveTabColor | Blue | Color for the active tab |
+| InactiveTabColor | Gray | Color for inactive tabs |
 
-### 1. Create the project
+## Usage
 
-Copy the template files and replace all placeholders:
+1. Press **P** (default) to open the stats panel
+2. Click "Stats" or "Reputation" tabs to switch views
+3. Drag the blue diamond handle to reposition the window
+4. Press **P** again to close
 
-| Placeholder | Example |
-|---|---|
-| `BetterStatsPage` | `ErenshorMyMod` |
-| `BetterStatsPage` | `MyModName` |
-| `Enhanced stats and reputation UI with tabbed interface` | `My cool Erenshor mod` |
-| `BetterStatsPage` | `MyModLogic` |
-| `betterstatspage` | `my_mod` |
-| `Better Stats Page` | `My Cool Mod` |
+## Based On
 
-Rename `ModName.csproj` and `ModName.cs` to match your mod.
+This mod is based on [Stat Menu Ui by Recks](https://thunderstore.io/c/erenshor/p/Recks/Stat_Menu_Ui/).
 
-### 2. Create a solution file (optional)
-
-```bash
-dotnet new sln -n MyModName
-dotnet sln add MyModName.csproj
-```
-
-### 3. Verify paths
-
-The `.csproj` assumes:
-- **Game install:** `~/.steam/steam/steamapps/common/Erenshor`
-- **Gale profile:** `~/.local/share/com.kesomannen.gale/erenshor/profiles/Default/BepInEx`
-
-Update `GamePath` and `GalePath` in the `.csproj` if your paths differ.
-
-### 4. Add Unity module references
-
-The template includes `UnityEngine` and `UnityEngine.CoreModule`. If your mod
-needs additional modules (UI, IMGUI, etc.), add them to the `<ItemGroup>`:
-
-```xml
-<Reference Include="UnityEngine.UI">
-  <HintPath>$(ManagedPath)/UnityEngine.UI.dll</HintPath>
-  <Private>False</Private>
-</Reference>
-```
-
-## Building
-
-```bash
-dotnet build
-```
-
-The PostBuild target automatically copies the DLL to your Gale profile's plugins
-folder. Verify the `DestinationFolder` in the `.csproj` matches where BepInEx
-expects to find your plugin.
-
-## Harmony Patch Reference
-
-### Patching a single method (no overloads)
-
-```csharp
-[HarmonyPatch(typeof(TargetClass), "MethodName")]
-public class TargetClass_MethodName_Patch
-{
-    private static void Postfix() { }
-}
-```
-
-### Patching a method with a specific signature
-
-```csharp
-[HarmonyPatch(typeof(TargetClass), "MethodName", new[] { typeof(string), typeof(int) })]
-public class TargetClass_MethodName_Patch
-{
-    private static void Prefix(string param1, int param2) { }
-}
-```
-
-### Patching all overloads of a method
-
-Use `TargetMethods()` when a method has multiple overloads to avoid
-`AmbiguousMatchException`:
-
-```csharp
-[HarmonyPatch]
-public class TargetClass_MethodName_Patch
-{
-    static IEnumerable<MethodBase> TargetMethods()
-    {
-        return AccessTools.GetDeclaredMethods(typeof(TargetClass))
-            .Where(m => m.Name == "MethodName");
-    }
-
-    private static void Prefix(/* first shared param */) { }
-}
-```
-
-## Testing
-
-BepInEx/Harmony mods require a full game restart to pick up a new DLL.
-There is no hot-reload. After building, restart Erenshor completely.
-
-Check the BepInEx log at:
-```
-<GalePath>/LogOutput.log
-```
-
+Enhancements include:
+- Tabbed interface with Stats and Reputation views
+- More comprehensive stat calculations
+- Draggable window with proper event handling
+- Auto-updating stats display
+- DontDestroyOnLoad pattern for scene persistence
