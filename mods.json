@@ -1,0 +1,43 @@
+{
+  "FastTravelMod": {
+    "version": "1.0.0",
+    "author": "YourName",
+    "description": "Fixes fast travel portal spells",
+    "active": true,
+    "dependencies": [],
+    "tags": [
+      "utility",
+      "teleport"
+    ]
+  },
+  "AreaMapMod": {
+    "version": "1.0.0",
+    "author": "YourName",
+    "description": "Adds area maps and world map toggle functionality",
+    "active": true,
+    "dependencies": [],
+    "tags": [
+      "ui",
+      "map"
+    ]
+  },
+  "MovementSpeedManager": {
+    "version": "1.0.0",
+    "author": "YourName",
+    "description": "Customizable movement speed adjustments",
+    "active": true,
+    "dependencies": [],
+    "tags": [
+      "gameplay",
+      "speed"
+    ]
+  },
+  "BetterStatsPage": {
+    "version": null,
+    "author": "noone",
+    "description": "Enhanced stats and reputation UI with tabbed interface",
+    "active": true,
+    "dependencies": [],
+    "tags": []
+  }
+}

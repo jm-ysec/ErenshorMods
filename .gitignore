@@ -1,0 +1,28 @@
+# Build outputs
+bin/
+obj/
+*.dll
+*.pdb
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Packages (built releases)
+packages/
+
+# Local config overrides
+local.config.json
+

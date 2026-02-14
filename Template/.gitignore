@@ -1,0 +1,4 @@
+*.sln
+__pycache__/
+bin/
+obj/

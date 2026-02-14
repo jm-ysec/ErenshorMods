@@ -1,0 +1,177 @@
+# Erenshor Area Maps — BepInEx Mod
+
+## Project Overview
+This is a BepInEx plugin mod for **Erenshor**, a single-player MMO-style RPG on Steam.
+It adds area maps and a world map toggle to the game.
+
+## Tech Stack
+- **Language:** C# (.NET Framework 4.7.2)
+- **Mod framework:** BepInEx 5
+- **Game engine:** Unity (via Assembly-CSharp.dll and UnityEngine assemblies)
+- **Build:** `dotnet build` (MSBuild / .csproj)
+
+## Build & Deploy
+- Build: `dotnet build`
+- The post-build step automatically copies the output DLL to the Gale mod manager profile at:
+  `~/.local/share/com.kesomannen.gale/erenshor/profiles/Default/BepInEx/plugins/AreaMaps/`
+- Game install path: `~/.steam/steam/steamapps/common/Erenshor`
+- Game managed assemblies: `<GamePath>/Erenshor_Data/Managed/`
+
+## Coding Conventions
+- Use file-scoped namespaces (`namespace Foo;`)
+- Target C# latest language features (LangVersion=latest)
+- Follow standard C# naming: PascalCase for public members, _camelCase for private fields
+- Keep Unity/BepInEx boilerplate minimal; prefer Harmony patches where possible
+
+## Key References
+- BepInEx docs: https://docs.bepinex.dev/
+- Erenshor game assemblies are referenced as non-private (not bundled in output)
+
+## Project Brief: Erenshor Modding (Linux/BepInEx)
+
+### 1. Context & Environment
+
+- **Game:** Erenshor (Unity/Mono)
+- **Platform:** Linux (Steam/Wine)
+- **Mod Manager:** Gale (Symlink-based)
+- **Framework:** .NET Framework 4.7.2 (via dotnet-sdk)
+- **Injection:** BepInEx 5 + Harmony
+
+### 2. Global Logic "Fixes" (Required for Updates)
+
+Recent game updates broke "Fast Travel" and "Area Map" mods due to strict distance checks and UI renaming.
+
+- **SpellRange Bug:** Portal spells were failing with "Too far away" even on self-cast because `SpellRange` was set to `0` or `1`. All portal spells must have their `SpellRange` forced to `9999f`.
+- **Azure Portal Rename:** The string `"Portal to Azure"` is missing in the current DB. Search Resources for the updated string (likely `"Portal to Port Azure"`).
+
+### 3. Fast Travel Mod (Reconstruction)
+
+**Objective:** Teach portal spells and bypass range checks.
+
+**File: `Plugin.cs`**
+
+```csharp
+using BepInEx;
+using HarmonyLib;
+
+namespace ErenshorFastTravel {
+    [BepInPlugin("com.Recks.fasttravelspellbook", "Fast Travel Spellbook", "1.1.0")]
+    public class FastTravelSpellbookPlugin : BaseUnityPlugin {
+        void Awake() {
+            var harmony = new Harmony("com.Recks.fasttravelspellbook");
+            harmony.PatchAll();
+            Logger.LogInfo("Fast Travel Fixed version loaded.");
+        }
+    }
+}
+```
+
+**File: `Patches.cs`**
+
+```csharp
+using HarmonyLib;
+using UnityEngine;
+using System.Linq;
+
+namespace ErenshorFastTravel {
+    [HarmonyPatch(typeof(PlayerControl), "Start")]
+    public class PlayerControl_Start_Patch {
+        static void Postfix() {
+            // Fix Range for all Portals in DB
+            if (GameData.SpellDatabase?.SpellDatabase != null) {
+                foreach (var s in GameData.SpellDatabase.SpellDatabase) {
+                    if (s != null && s.SpellName.Contains("Portal")) {
+                        s.SpellRange = 9999f;
+                    }
+                }
+            }
+
+            // Registration
+            string[] spells = {
+                "Portal to Port Azure",
+                "Portal to Braxonian",
+                "Portal to Ripper's Keep",
+                "Portal to Silkengrass",
+                "Portal to Soluna's Landing"
+            };
+            foreach (var name in spells) TeachSpell(name);
+        }
+
+        static void TeachSpell(string spellName) {
+            var spell = GameData.SpellDatabase.SpellDatabase
+                .FirstOrDefault(s => s.SpellName == spellName);
+            if (spell == null) return;
+            var mySpells = GameData.PlayerControl.Myself.MySpells;
+            if (!mySpells.KnownSpells.Contains(spell))
+                mySpells.KnownSpells.Add(spell);
+        }
+    }
+}
+```
+
+### 4. Area Maps Mod (Reconstruction)
+
+**Objective:** Inject a toggle button into existing "Map" UI and swap textures.
+
+**File: `MapPlugin.cs`**
+
+```csharp
+using BepInEx;
+using UnityEngine;
+
+namespace ErenshorAreaMaps {
+    [BepInPlugin("com.ayloonah.erenshor_area_maps_mod", "Erenshor Area Maps Mod", "1.0.1")]
+    public class MapPlugin : BaseUnityPlugin {
+        void Awake() {
+            GameObject mapHandler = new GameObject("AreaMapsController");
+            mapHandler.AddComponent<AreaMapsLogic>();
+            Object.DontDestroyOnLoad(mapHandler);
+        }
+    }
+}
+```
+
+**File: `AreaMapsLogic.cs` (Key Logic)**
+
+- **Lifecycle:** Uses `SceneManager.sceneLoaded`.
+- **UI Target:** Searches `Resources.FindObjectsOfTypeAll<RectTransform>()` for name `"Map"`.
+- **Assets:** Loads `.png` from `Path.Combine(Paths.PluginPath, "AreaMaps", "Assets")`.
+- **Linux Note:** Filenames and paths are case-sensitive.
+
+### 5. Linux Build System (`.csproj`)
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <GamePath>$(HOME)/.steam/steam/steamapps/common/Erenshor</GamePath>
+    <GalePath>$(HOME)/.local/share/com.kesomannen.gale/erenshor/profiles/Default/BepInEx</GalePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(GamePath)/Erenshor_Data/Managed/Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(GamePath)/Erenshor_Data/Managed/UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(GamePath)/Erenshor_Data/Managed/UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(GalePath)/core/BepInEx.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(GalePath)/core/0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
+          DestinationFolder="$(GalePath)/plugins/$(AssemblyName)/" />
+  </Target>
+</Project>
+```
