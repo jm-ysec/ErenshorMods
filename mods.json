@@ -39,5 +39,13 @@
     "active": true,
     "dependencies": [],
     "tags": []
+  },
+  "RealWorldClock": {
+    "version": null,
+    "author": "noone",
+    "description": "Displays a real-world clock on screen. Draggable with middle mouse button.",
+    "active": true,
+    "dependencies": [],
+    "tags": []
   }
 }
