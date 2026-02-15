@@ -39,69 +39,56 @@ namespace DruidSpells
         private static Sprite _spellScrollIcon;
 
         /// <summary>
-        /// Finds the icon used by existing spell scrolls in the game.
+        /// Finds the icon used by existing druid spell scrolls in the game.
+        /// The most reliable method is to copy the sprite directly from an existing scroll item
+        /// since that's exactly what the game uses.
         /// </summary>
         private static Sprite GetSpellScrollIcon()
         {
             if (_spellScrollIcon != null) return _spellScrollIcon;
 
-            // Try to find sprite named "8" (the druid spell scroll icon)
-            // Log all sprites named "8" to help identify the correct one
-            var allSprites = Resources.FindObjectsOfTypeAll<Sprite>();
-            int spriteCount = 0;
-            foreach (var sprite in allSprites)
-            {
-                if (sprite.name == "8")
-                {
-                    spriteCount++;
-                    var tex = sprite.texture;
-                    Plugin.Instance.Logger.LogInfo($"[VendorIntegration] Found sprite '8' #{spriteCount}: " +
-                        $"Texture={tex?.name ?? "null"}, Size={sprite.rect.width}x{sprite.rect.height}, " +
-                        $"PixelsPerUnit={sprite.pixelsPerUnit}");
-
-                    // Store first one found as fallback
-                    if (_spellScrollIcon == null)
-                    {
-                        _spellScrollIcon = sprite;
-                    }
-                    // Prefer sprites from a texture that looks like item icons (often named "Items" or similar)
-                    if (tex != null && (tex.name.Contains("Item") || tex.name.Contains("Scroll") || tex.name.Contains("Spell")))
-                    {
-                        _spellScrollIcon = sprite;
-                        Plugin.Instance.Logger.LogInfo($"[VendorIntegration] Selected sprite from texture: {tex.name}");
-                    }
-                }
-            }
-
-            if (_spellScrollIcon != null)
-            {
-                Plugin.Instance.Logger.LogInfo($"[VendorIntegration] Using sprite '8' from texture: {_spellScrollIcon.texture?.name ?? "unknown"}");
-                return _spellScrollIcon;
-            }
-
-            // Fallback: Search for any existing item with TeachSpell set and copy its icon
+            // Best approach: Find an existing druid spell scroll and copy its sprite
+            // This guarantees we get the exact same sprite the game uses
             if (GameData.ItemDB?.ItemDB != null)
             {
-                Plugin.Instance.Logger.LogInfo($"[VendorIntegration] Searching {GameData.ItemDB.ItemDB.Length} items for spell scrolls...");
+                // Look for known druid spell scrolls by name pattern
                 foreach (var item in GameData.ItemDB.ItemDB)
                 {
-                    if (item != null && item.TeachSpell != null)
+                    if (item != null && item.TeachSpell != null && item.ItemIcon != null)
                     {
-                        Plugin.Instance.Logger.LogInfo($"[VendorIntegration] Found scroll: {item.ItemName} (ID: {item.Id}, Icon: {item.ItemIcon?.name ?? "null"})");
-                        if (item.ItemIcon != null && _spellScrollIcon == null)
+                        // Druid scrolls have Object.name like "SPELL SCROLL - DruDD ..." or "SPELL SCROLL - Biting Vines"
+                        // We want the green druid scroll icon (sprite "8", 512x512)
+                        if (item.name.Contains("Biting Vines") ||
+                            item.name.Contains("DruDD") ||
+                            item.name.Contains("Summon Forest"))
                         {
                             _spellScrollIcon = item.ItemIcon;
+                            Plugin.Instance.Logger.LogInfo($"[VendorIntegration] Copied sprite from existing druid scroll: {item.ItemName}");
+                            Plugin.Instance.Logger.LogInfo($"[VendorIntegration] Sprite: name={_spellScrollIcon.name}, " +
+                                $"size={_spellScrollIcon.rect.width}x{_spellScrollIcon.rect.height}");
+                            return _spellScrollIcon;
                         }
                     }
                 }
-                if (_spellScrollIcon != null)
+
+                // Fallback: any spell scroll with the "8" icon that's 512x512
+                foreach (var item in GameData.ItemDB.ItemDB)
                 {
-                    Plugin.Instance.Logger.LogInfo($"[VendorIntegration] Using sprite: {_spellScrollIcon.name}");
-                    return _spellScrollIcon;
+                    if (item != null && item.TeachSpell != null && item.ItemIcon != null)
+                    {
+                        if (item.ItemIcon.name == "8" &&
+                            item.ItemIcon.rect.width == 512 &&
+                            item.ItemIcon.rect.height == 512)
+                        {
+                            _spellScrollIcon = item.ItemIcon;
+                            Plugin.Instance.Logger.LogInfo($"[VendorIntegration] Copied 512x512 sprite from: {item.ItemName}");
+                            return _spellScrollIcon;
+                        }
+                    }
                 }
             }
 
-            Plugin.Instance.Logger.LogWarning("[VendorIntegration] Could not find existing spell scroll icon");
+            Plugin.Instance.Logger.LogWarning("[VendorIntegration] Could not find existing druid spell scroll icon");
             return null;
         }
 
@@ -186,4 +173,3 @@ namespace DruidSpells
         }
     }
 }
-
