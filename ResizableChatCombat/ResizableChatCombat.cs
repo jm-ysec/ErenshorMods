@@ -31,7 +31,6 @@ namespace ResizableChatCombat
                 return;
             }
             _instance = this;
-            Debug.Log("ResizableChatCombatController: Initialized");
         }
 
         private void Update()
@@ -81,26 +80,16 @@ namespace ResizableChatCombat
             if (chatWindowScaler != null && chatWindowScaler.ChatBox != null)
             {
                 chatBackdropRT = chatWindowScaler.ChatBox;
-                Debug.Log($"ResizableChatCombat: Found Chat WindowScaler, ChatBox={chatBackdropRT.name}");
             }
             else
             {
                 // Look for sibling named "ChatWindow" - this is the visual backdrop
-                Debug.Log("ResizableChatCombat: No WindowScaler found for chat, looking for ChatWindow sibling");
                 chatBackdropRT = FindSiblingByName(chatWindowRT, "ChatWindow");
-                if (chatBackdropRT != null)
+                if (chatBackdropRT == null)
                 {
-                    Debug.Log($"ResizableChatCombat: Found ChatWindow sibling as backdrop, size={chatBackdropRT.rect.size}");
-                }
-                else
-                {
-                    Debug.Log("ResizableChatCombat: ChatWindow sibling not found, falling back to parent");
                     chatBackdropRT = chatWindowRT.parent?.GetComponent<RectTransform>();
                 }
             }
-
-            Debug.Log($"ResizableChatCombat: Chat ScrollRect found: {chatWindowRT.name}");
-            LogHierarchy(chatWindowRT, "Chat");
 
             // Combat content is separate - find its ScrollRect
             var combatContent = GameData.ChatLog.combatContent;
@@ -113,23 +102,17 @@ namespace ResizableChatCombat
                     if (scrollRect != null && scrollRect != chatScrollRect)
                     {
                         combatWindowRT = scrollRect.GetComponent<RectTransform>();
-                        Debug.Log($"ResizableChatCombat: Combat ScrollRect found: {combatWindowRT?.name ?? "null"}");
 
                         // Find WindowScaler for combat window
                         var combatWindowScaler = scrollRect.GetComponentInParent<WindowScaler>();
                         if (combatWindowScaler != null && combatWindowScaler.ChatBox != null)
                         {
                             combatBackdropRT = combatWindowScaler.ChatBox;
-                            Debug.Log($"ResizableChatCombat: Found Combat WindowScaler, ChatBox={combatBackdropRT.name}");
                         }
                         else
                         {
-                            Debug.Log("ResizableChatCombat: No WindowScaler found for combat, falling back to parent");
                             combatBackdropRT = combatWindowRT?.parent?.GetComponent<RectTransform>();
                         }
-
-                        if (combatWindowRT != null)
-                            LogHierarchy(combatWindowRT, "Combat");
                     }
                 }
             }
@@ -137,59 +120,7 @@ namespace ResizableChatCombat
             // Create resize handles
             CreateResizeHandles();
 
-            // Apply saved sizes (disabled for now)
-            // ApplySavedSizes();
-
             initialized = true;
-            Debug.Log("ResizableChatCombat: Initialization complete");
-        }
-
-        /// <summary>
-        /// Log the hierarchy for debugging - both parents AND siblings
-        /// </summary>
-        private void LogHierarchy(RectTransform rt, string label)
-        {
-            // Log parent chain
-            Transform current = rt.transform;
-            string hierarchy = "";
-            for (int i = 0; i < 5 && current != null; i++)
-            {
-                var img = current.GetComponent<Image>();
-                hierarchy += $"{current.name}(img:{img != null}) -> ";
-                current = current.parent;
-            }
-            Debug.Log($"ResizableChatCombat: {label} parent hierarchy: {hierarchy}");
-
-            // Log siblings of the ScrollRect
-            if (rt.parent != null)
-            {
-                string siblings = "Siblings: ";
-                for (int i = 0; i < rt.parent.childCount; i++)
-                {
-                    var sibling = rt.parent.GetChild(i);
-                    var sibImg = sibling.GetComponent<Image>();
-                    var sibRT = sibling.GetComponent<RectTransform>();
-                    if (sibRT != null)
-                    {
-                        siblings += $"{sibling.name}(img:{sibImg != null}, size:{sibRT.rect.size}) | ";
-                    }
-                }
-                Debug.Log($"ResizableChatCombat: {label} {siblings}");
-            }
-
-            // Log children of ScrollRect
-            string children = "Children: ";
-            for (int i = 0; i < rt.childCount; i++)
-            {
-                var child = rt.GetChild(i);
-                var childImg = child.GetComponent<Image>();
-                var childRT = child.GetComponent<RectTransform>();
-                if (childRT != null)
-                {
-                    children += $"{child.name}(img:{childImg != null}, size:{childRT.rect.size}) | ";
-                }
-            }
-            Debug.Log($"ResizableChatCombat: {label} {children}");
         }
 
         /// <summary>
@@ -354,7 +285,6 @@ namespace ResizableChatCombat
                         if (sibling.name == "BottomBG")
                         {
                             bottomBar = sibling.GetComponent<RectTransform>();
-                            Debug.Log($"ResizeHandle: Found BottomBG bar, size={bottomBar.rect.size}");
                         }
                         // Also track elements that need to stay fixed with the bottom bar
                         else if (sibling.name == "AutomateAttack" || sibling.name == "CombatBG" ||
@@ -364,7 +294,6 @@ namespace ResizableChatCombat
                             if (rt != null)
                             {
                                 combatBottomElements.Add(rt);
-                                Debug.Log($"ResizeHandle: Found combat bottom element: {sibling.name}");
                             }
                         }
                     }
@@ -374,21 +303,14 @@ namespace ResizableChatCombat
                         if (sibling.name == "InputBox")
                         {
                             bottomBar = sibling.GetComponent<RectTransform>();
-                            Debug.Log($"ResizeHandle: Found InputBox bar, size={bottomBar.rect.size}");
                         }
                         else if (sibling.name == "Image" && topBar == null)
                         {
                             topBar = sibling.GetComponent<RectTransform>();
-                            Debug.Log($"ResizeHandle: Found top Image bar, size={topBar.rect.size}");
                         }
                     }
                 }
             }
-
-            Debug.Log($"ResizeHandle: Initialized for {target.name}, backdrop={backdrop?.name ?? "null"}, isCombat={isCombatWindow}");
-            Debug.Log($"ResizeHandle: Target size={target.rect.size}, Backdrop size={backdrop?.rect.size}");
-            if (isCombatWindow)
-                Debug.Log($"ResizeHandle: Found {combatBottomElements.Count} combat bottom elements to track");
         }
 
         public void SetVisible(bool visible)
@@ -455,9 +377,6 @@ namespace ResizableChatCombat
             {
                 combatBottomElementsFixedCorners.Add(GetBarFixedCorner(elem));
             }
-
-            Debug.Log($"ResizeHandle: Started drag, target={startSize}, backdrop={startBackdropSize}, isCombat={isCombatWindow}");
-            Debug.Log($"ResizeHandle: Fixed corner world pos: target={targetFixedCornerWorld}");
         }
 
         public void OnPointerUp(PointerEventData eventData)
@@ -467,8 +386,6 @@ namespace ResizableChatCombat
             dragging = false;
             GameData.DraggingUIElement = false;
             SaveSize();
-
-            Debug.Log($"ResizeHandle: Finished drag, final size={targetWindow.rect.size}");
         }
 
         private void ResizeAndFixCorner(RectTransform rt, float newWidth, float newHeight, Vector3 fixedCornerWorld)
@@ -566,8 +483,6 @@ namespace ResizableChatCombat
             widthConfig.Value = targetWindow.sizeDelta.x;
             heightConfig.Value = targetWindow.sizeDelta.y;
             Plugin.Instance.SaveConfig();
-
-            Debug.Log($"ResizeHandle: Saved size {targetWindow.sizeDelta}");
         }
     }
 }

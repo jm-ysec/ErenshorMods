@@ -55,5 +55,13 @@
     "active": true,
     "dependencies": [],
     "tags": []
+  },
+  "DruidSpells": {
+    "version": null,
+    "author": "noone",
+    "description": "Adds custom Druid spells including Spirit of the Wolf",
+    "active": true,
+    "dependencies": [],
+    "tags": []
   }
 }

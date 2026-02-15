@@ -1,6 +1,10 @@
+---
+type: "always_apply"
+---
+
 # Erenshor Game Objects Reference
 
-This document indexes the decompiled game classes available in the `GameLibrary/` folder for mod development reference.
+This document indexes the decompiled game classes available in the `GameLibrary/` folder for mod development reference.  If you notice an object reference you need that isn't here, ask and I will add it from ILSpy.  Make sure you update this list when you notice a new one.  
 
 ## Core Systems
 
