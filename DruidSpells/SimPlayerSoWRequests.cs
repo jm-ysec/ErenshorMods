@@ -143,7 +143,7 @@ namespace DruidSpells
                 string message = WhisperMessages[Random.Range(0, WhisperMessages.Length)];
                 string npcName = sim.GetComponent<NPC>()?.NPCName ?? sim.transform.name;
 
-                Logger?.LogInfo($"[SoW Request] {npcName} whispers for SoW (roll: {roll:F2} < chance: {chance:F4})");
+                // Logger?.LogInfo($"[SoW Request] {npcName} whispers for SoW (roll: {roll:F2} < chance: {chance:F4})");
 
                 GameData.SimMngr.LoadResponse(
                     "[WHISPER FROM] " + npcName + ": " + GameData.SimMngr.PersonalizeString(message, sim),
@@ -195,7 +195,7 @@ namespace DruidSpells
                 string message = ShoutMessages[Random.Range(0, ShoutMessages.Length)];
                 string npcName = sim.GetComponent<NPC>()?.NPCName ?? sim.transform.name;
 
-                Logger?.LogInfo($"[SoW Request] {npcName} shouts for SoW (roll: {roll:F2} < chance: {chance:F4})");
+                // Logger?.LogInfo($"[SoW Request] {npcName} shouts for SoW (roll: {roll:F2} < chance: {chance:F4})");
 
                 UpdateSocialLog.LogAdd(npcName + " shouts: " + GameData.SimMngr.PersonalizeString(message, sim), "#FF9000");
 
@@ -214,22 +214,14 @@ namespace DruidSpells
 
             _lastDebugLogTime = Time.time;
 
-            if (_checksPerformed > 0)
-            {
-                Logger?.LogInfo($"[SoW Request Debug] Last {DebugLogInterval}s: " +
-                    $"Checks={_checksPerformed}, HasBuff={_skippedHasBuff}, Cooldown={_skippedCooldown}, " +
-                    $"Grouped={_skippedGrouped}, RollFailed={_rollsFailed}, " +
-                    $"Whispers={_whispersSent}, Shouts={_shoutsSent}");
-
-                // Reset counters
-                _checksPerformed = 0;
-                _skippedHasBuff = 0;
-                _skippedCooldown = 0;
-                _skippedGrouped = 0;
-                _rollsFailed = 0;
-                _whispersSent = 0;
-                _shoutsSent = 0;
-            }
+            // Reset counters (debug logging disabled)
+            _checksPerformed = 0;
+            _skippedHasBuff = 0;
+            _skippedCooldown = 0;
+            _skippedGrouped = 0;
+            _rollsFailed = 0;
+            _whispersSent = 0;
+            _shoutsSent = 0;
         }
 
         /// <summary>
@@ -314,8 +306,8 @@ namespace DruidSpells
 
                 // Use instance-based timing via a simple random check to spread out processing
                 // This avoids all SimPlayers checking at once
-                // ~2% of frames pass through (was 0.1%) - increased for testing
-                if (Random.Range(0f, 100f) > 2f)
+                // ~0.5% of frames pass through
+                if (Random.Range(0f, 100f) > 0.5f)
                     return;
 
                 // Try whisper request (to player)

@@ -112,44 +112,11 @@ namespace DruidSpells
     }
 
     /// <summary>
-    /// Harmony patches to inject custom spells into the game's SpellDB
-    /// and teach them to the player automatically.
+    /// Harmony patches to inject custom spells into the game's SpellDB.
+    /// Spells are acquired from the Druid spell vendor Tiver Banes in Port Azure.
     /// </summary>
     public static class DruidSpellsPatches
     {
-        /// <summary>
-        /// Patch PlayerControl.Start() to teach custom spells to the player automatically.
-        /// This runs when the player loads into the game world.
-        /// </summary>
-        [HarmonyPatch(typeof(PlayerControl), "Start")]
-        public class PlayerControl_Start_Patch
-        {
-            private static void Postfix()
-            {
-                // Teach all custom spells to the player
-                foreach (var spell in SpellRegistry.GetCreatedSpells())
-                {
-                    TeachSpellSilently(spell);
-                }
-            }
-
-            /// <summary>
-            /// Teach a spell without sound/visual effects (silent load)
-            /// </summary>
-            private static void TeachSpellSilently(Spell spell)
-            {
-                if (spell == null) return;
-
-                CastSpell mySpells = GameData.PlayerControl.Myself.MySpells;
-
-                if (!mySpells.KnownSpells.Contains(spell))
-                {
-                    mySpells.KnownSpells.Add(spell);
-                    Debug.Log($"DruidSpellsPatches: Taught '{spell.SpellName}' to player");
-                }
-            }
-        }
-
         /// <summary>
         /// Patch SpellDB.Start() to inject custom spells after the database loads.
         /// </summary>
